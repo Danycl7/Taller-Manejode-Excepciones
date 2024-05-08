@@ -29,7 +29,10 @@ class Frame:
         return sum(self.rolls)
 
 class TenthFrame(Frame):
-    def add_roll(self, pins):
+    def __init__(self):
+        pass
+    
+    def add_roll_tenth_frame(self, pins):
         if len(self.rolls) < 3:
             self.rolls.append(pins)
             if len(self.rolls) == 1 and not self.is_strike():
@@ -98,10 +101,39 @@ class BowlingGame:
 def main():
     game = BowlingGame()
     while not game.is_game_over():
+        current_frame = game.frames[game.current_frame]
         try:
-            print(f"Frame {game.current_frame + 1}, Roll {len(game.frames[game.current_frame].rolls) + 1}")
+            print(f"Frame {game.current_frame + 1}, Roll {len(current_frame.rolls) + 1}")
             pins = int(input("Enter pins knocked down: "))
+
+            
+            if pins < 0 or pins > 20:
+                print("Invalid input! Please enter a number from 0 to 20.")
+                continue
+
+           
+            if not current_frame.is_tenth_frame() and len(current_frame.rolls) == 1:
+                remaining_pins = 20 - current_frame.rolls[0]
+                if pins > remaining_pins:
+                    print(f"Invalid input! Only {remaining_pins} pins are left.")
+                    continue
+
+            
+            if current_frame.is_tenth_frame():
+                if len(current_frame.rolls) == 1 and not current_frame.is_strike():
+                    remaining_pins = 20 - current_frame.rolls[0]
+                    if pins > remaining_pins:
+                        print(f"Invalid input! Only {remaining_pins} pins are left.")
+                        continue
+                elif len(current_frame.rolls) == 2 and current_frame.is_strike() and current_frame.rolls[1] < 20:
+                    remaining_pins = 20 - current_frame.rolls[1]
+                    if pins > remaining_pins:
+                        print(f"Invalid input! Only {remaining_pins} pins are left.")
+                        continue
+
             game.roll(pins)
+        except ValueError:
+            print("Please enter a valid integer number.")
         except Exception as e:
             print(str(e))
 
